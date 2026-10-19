@@ -9,15 +9,25 @@ Tested on macOS 15.6 (arm64) with an HP LaserJet 1020 Plus (USB `03f0:2b17`).
 
 ## Install
 
-Plug the printer in over USB, then:
+1. Download **`HP-LaserJet-1020-Driver-<version>.pkg`** from the
+   [latest release](https://github.com/UtkarshChandel/hp1020-macos-driver/releases/latest).
+2. Plug the printer in over USB and switch it on.
+3. Double-click the `.pkg` and click through the installer.
 
-```bash
-git clone https://github.com/UtkarshChandel/hp1020-macos-driver.git
-cd hp1020-macos-driver && ./install.sh   # needs Rust (https://rustup.rs) and your password once
-lp -d HP_LaserJet_1020 /etc/hosts
-```
+That's it. The installer installs the driver, downloads the printer firmware, and adds
+**HP LaserJet 1020** as your default printer. Print from any app with `Cmd-P`. If the
+printer wasn't connected during install, plug it in later and add it in
+**System Settings → Printers & Scanners → Add Printer**; the driver is picked automatically.
 
-`./uninstall.sh` removes everything.
+**"Apple could not verify…" warning:** the package is not signed with a paid Apple
+Developer ID, so the first time you open it macOS blocks it. Click **Done**, open
+**System Settings → Privacy & Security**, scroll down, click **Open Anyway** next to the
+package name, and confirm. (Or in Terminal: `xattr -d com.apple.quarantine ~/Downloads/HP-LaserJet-1020-Driver-*.pkg`.)
+
+**Uninstall:** double-click `/Library/Printers/hp1020/uninstall.command`.
+
+**Build from source instead:** `./install.sh` (needs [Rust](https://rustup.rs)). It builds the
+same package locally and installs it. `packaging/build-pkg.sh` only builds `dist/*.pkg`.
 
 ## How it works
 
@@ -43,8 +53,10 @@ These printers have **no firmware in flash**. After every power-on, the host mus
 ~129 KB blob (`@PJL ENTER LANGUAGE=ACL` + an ARM ELF) before the printer can print. The
 backend reads the IEEE-1284 Device ID. If there is no `FWVER:` field, it uploads
 `/Library/Printers/hp1020/firmware/hp_laserjet_1020.fw` and then waits for the printer to
-boot. `install.sh` downloads HP's firmware from the HPLIP plugin on OpenPrinting and
-checks its SHA-256. It is not redistributed here.
+boot. The installer downloads HP's firmware from the HPLIP plugin on OpenPrinting and
+checks its SHA-256 (`/Library/Printers/hp1020/fetch-firmware.sh`; rerun it with sudo if
+you installed offline). HP's license forbids redistributing it, so it is in neither this
+repository nor the package.
 
 **Gotcha found during bring-up:** the firmware takes ~30 s to boot. Any USB request sent
 during that window (even a Device-ID control request) is lost or wedges the printer until

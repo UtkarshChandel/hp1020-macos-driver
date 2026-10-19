@@ -128,7 +128,7 @@ fn ensure_firmware(p: Printer, info: &nusb::DeviceInfo, fw_override: Option<Path
         return Ok(p);
     }
     let path = fw_override.or_else(|| firmware_path(p.model)).ok_or_else(|| {
-        format!("firmware {} not found (expected in {FIRMWARE_DIR})", p.model.firmware)
+        format!("firmware {} not found in {FIRMWARE_DIR}; run: sudo /Library/Printers/hp1020/fetch-firmware.sh", p.model.firmware)
     })?;
     let fw = std::fs::read(&path)?;
     eprintln!("STATE: +connecting-to-device");

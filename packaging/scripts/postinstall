@@ -1,0 +1,27 @@
+#!/bin/bash
+# Runs as root after the payload is installed.
+LOG=/Library/Printers/hp1020/install.log
+exec >>"$LOG" 2>&1
+echo "== postinstall $(date)"
+
+# 1. HP firmware (needs internet; the backend reports clearly if it is missing)
+if ! /Library/Printers/hp1020/fetch-firmware.sh; then
+    echo "WARNING: firmware download failed; run: sudo /Library/Printers/hp1020/fetch-firmware.sh"
+fi
+
+# 2. Create the queue now if the printer is plugged in. Otherwise it shows up later in
+#    System Settings > Printers & Scanners > Add Printer with this driver preselected.
+URI="$(/usr/libexec/cups/backend/hp1020 2>/dev/null | awk '/^direct hp1020:/{print $2; exit}')"
+if [ -n "$URI" ]; then
+    /usr/sbin/lpadmin -p HP_LaserJet_1020 -E -v "$URI" \
+        -P "/Library/Printers/PPDs/Contents/Resources/HP LaserJet 1020 Native.ppd" \
+        -o printer-is-shared=false -D "HP LaserJet 1020" -L "USB" \
+        && echo "queue HP_LaserJet_1020 -> $URI"
+    # make it the default printer for the user who ran the installer
+    if [ -n "${USER:-}" ] && [ "$USER" != root ]; then
+        sudo -u "$USER" /usr/bin/lpoptions -d HP_LaserJet_1020 >/dev/null 2>&1 || true
+    fi
+else
+    echo "printer not connected; queue will be created via Add Printer"
+fi
+exit 0
