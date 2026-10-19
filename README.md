@@ -81,6 +81,13 @@ backend is installed root-owned `0700`, so CUPS runs it as root.
 `Toner Saver` (EconoMode) and `Print Density` (1-5) appear in the print dialog. Paper sizes:
 A4, Letter, Legal, Executive, A5, B5.
 
+## Developer docs
+
+Start with [AGENTS.md](AGENTS.md). Deeper material is in `docs/`:
+[architecture](docs/ARCHITECTURE.md), [protocol](docs/PROTOCOL.md),
+[hardware notes](docs/HARDWARE-NOTES.md), [bring-up log](docs/BRING-UP-LOG.md),
+[testing](docs/TESTING.md), [releasing](docs/RELEASING.md), [roadmap](docs/ROADMAP.md).
+
 ## License
 
 GPL-2.0-or-later (see `LICENSE`). `src/jbig.rs` is a port of jbig-kit's encoder, and the
