@@ -1,0 +1,11 @@
+[package]
+name = "hp1020"
+version = "0.1.0"
+edition = "2021"
+description = "Native macOS CUPS driver (filter + USB backend) for the HP LaserJet 1018/1020/1020 Plus"
+license = "GPL-2.0-or-later"
+repository = "https://github.com/UtkarshChandel/hp1020-macos-driver"
+
+[dependencies]
+libc = "0.2.191"
+nusb = "0.2.5"
